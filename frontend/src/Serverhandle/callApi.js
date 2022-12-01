@@ -26,7 +26,7 @@ export async function callApi({ endpoint, method = 'get', body = undefined, full
                         a.click();
                     });
                 }else {
-                    alert("no")
+                    alert("Unauthorized access/File does not exist")
                 }
             }).catch(err => console.log(err));
     }
