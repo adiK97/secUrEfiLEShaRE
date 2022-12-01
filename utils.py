@@ -1,6 +1,15 @@
 import bcrypt
 from basicauth import encode
 import json
+from flask import Flask, request
+import ftplib
+import dotenv
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+app = Flask(__name__)
+
 
 resource_file = "ftpServer/passwords.json"
 
@@ -12,7 +21,7 @@ def add_user(username,password):
         passw  = json.load(openfile)
 
     if username in passw.keys():
-        raise Exception(username)
+        return "Failed"
     else:
         passw[username] = str(encode(username,password))
         with open(resource_file, "w") as outfile:
@@ -31,18 +40,31 @@ def check_login(username,password):
             return username
     return
 
-def create_username(username,password):
-     try: 
-         username = add_user(username,password)
-         print("Added User! %s"%username)
-     except Exception as e:
-         print("Failed to add user %s! ... user already exists??"%username)
 
-def login(username,password):
-     if check_login(username,password):
-        return True
-     else:
-        return False
+@app.route('/addUser', methods=['GET', 'POST'])
+def create_username():
+    data = request.get_json(force=True)
+    username,password = data["username"] , data["password"]
+    if add_user(username,password):
+         return username
+    else:
+        return "Failed"
 
-def create_group():
-    pass
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    data = request.get_json(force=True)
+    username,password = data["username"] , data["password"]
+    if check_login(username,password):
+        connectFTP()
+        return username
+    else:
+       return "Failed"
+
+def connectFTP():
+    ftp_server = ftplib.FTP(os.getenv("HOSTNAME"), os.getenv("USERNAME"),os.getenv("PASSWORD") )
+    ftp_server.encoding = "utf-8"
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=4000)
