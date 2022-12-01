@@ -13,7 +13,7 @@ export const sendFile = async (formData) => {
 }
 
 export const downloadFile = async (filename, username) => {
-  return await callApi({ endpoint: 'download', method: 'post', body: { filename, username } })
+  return await callApi({ endpoint: 'download', method: 'post', body: { filename, username }, downloadAPI: true })
 }
 
 export const getFileList = async () => {

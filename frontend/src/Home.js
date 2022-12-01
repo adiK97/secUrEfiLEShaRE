@@ -27,20 +27,22 @@ export default function (props) {
         fetch("http://192.168.1.149:4000/file", requestOptions)
             .then(response => response.text())
             .then(result => console.log(result))
-            .catch(error => console.log('error', error));
+            .catch(error => console.log('error', error)).then(fetchList)
     };
-
-    useEffect(() => {
-        getFileList().then((e) => {
+    const fetchList = async () => {
+        await getFileList().then((e) => {
             setFileList(e)
             console.log(e)
         })
+    }
+    useEffect(() => {
+        fetchList()
     }, [])
     return (
         <>
             <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                 <div className="Auth-form-container" style={{ flex: 1, flexDirection: 'column' }}>
-                    <form className="Auth-form">
+                    <div className="Auth-form">
                         <div className="Auth-form-content">
                             <h3 className="Auth-form-title">Upload a File</h3>
                             <input type="file" name="file" onChange={changeHandler} style={{ textAlign: 'center' }} />
@@ -71,7 +73,7 @@ export default function (props) {
                                 <button onClick={handleSubmission}>Submit</button>
                             </div>
                         </div>
-                    </form>
+                    </div>
                     <button style={{ margin: 15 }} onClick={() => navigate('/')}>Logout, {location?.state?.username}</button>
                 </div>
                 <div style={{ display: 'flex', flex: 1, }}>
@@ -79,9 +81,12 @@ export default function (props) {
                     <div className="Auth-form-content">
                         <h3 className="Auth-form-title">Uploaded File Directory</h3>
                         {fileList.map((filename) => {
+                            console.log('available file', filename, location?.state?.username)
                             return (
                                 <div style={{ border: '1px solid grey' }}>
-                                    <button onClick={() => { downloadFile(filename, location?.state?.username || '').then(alert('download started')) }}>{filename}</button>
+                                    <button onClick={() => {
+                                        downloadFile(filename, location?.state?.username || '').then(console.log)
+                                    }}>{filename}</button>
                                 </div>)
                         })}
                     </div>
