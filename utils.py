@@ -79,8 +79,8 @@ def upload_file():
         with open(uploaded_file.filename, "rb") as file:
             ftp_server.storbinary(f"STOR {uploaded_file.filename}", file)
         ftp_server.quit()
-        return "Uploaded"
-    return "Failed"
+        return {'result':True}
+    return {"result":False}
 
 @app.route('/uploadFile', methods=['GET'])
 def fileList():

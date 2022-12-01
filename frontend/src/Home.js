@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { sendFile } from './Serverhandle/Apis'
+import { getFileList, sendFile } from './Serverhandle/Apis'
 export default function (props) {
     const location = useLocation()
     const [selectedFile, setSelectedFile] = useState();
+    const [fileList, setFileList] = useState([]);
     const [isFilePicked, setIsFilePicked] = useState(false);
     const navigate = useNavigate()
     const changeHandler = (event) => {
@@ -13,10 +14,16 @@ export default function (props) {
 
     const handleSubmission = () => {
         const formData = new FormData();
-        formData.append('File', selectedFile);
+        formData.append('file', selectedFile);
         sendFile(formData).catch(alert)
     };
 
+    useEffect(() => {
+        getFileList().then((e)=>{
+            setFileList(e)
+            console.log(e)
+        })
+    }, [])
     return (
         <>
             <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
