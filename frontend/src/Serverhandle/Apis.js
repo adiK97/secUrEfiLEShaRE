@@ -9,9 +9,13 @@ export const createUserAPI = async (username, password) => {
 }
 
 export const sendFile = async (formData) => {
-  return await callApi({ endpoint: 'uploadFile', method: 'post', body: formData })
+  return await callApi({ endpoint: 'file', method: 'post', body: formData })
+}
+
+export const downloadFile = async (name) => {
+  return await callApi({ endpoint: 'file', method: 'get', body: { filename: name } })
 }
 
 export const getFileList = async () => {
-  return await callApi({ endpoint: 'uploadFile', method: 'get' })
+  return await callApi({ endpoint: 'fileList', method: 'get' })
 }

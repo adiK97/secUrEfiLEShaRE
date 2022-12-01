@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getFileList, sendFile } from './Serverhandle/Apis'
+import { downloadFile, getFileList, sendFile } from './Serverhandle/Apis'
 export default function (props) {
     const location = useLocation()
     const [selectedFile, setSelectedFile] = useState();
@@ -8,18 +8,30 @@ export default function (props) {
     const [isFilePicked, setIsFilePicked] = useState(false);
     const navigate = useNavigate()
     const changeHandler = (event) => {
+        console.log('sdfasdf', event.target.files[0])
         setSelectedFile(event.target.files[0]);
         setIsFilePicked(true);
     };
+    const [authUserList, setAuthUsers] = useState('')
 
     const handleSubmission = () => {
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        sendFile(formData).catch(alert)
+        var formdata = new FormData();
+        formdata.append("file", selectedFile);
+        formdata.append('users', authUserList)
+        var requestOptions = {
+            method: 'POST',
+            body: formdata,
+            redirect: 'follow'
+        };
+
+        fetch("http://192.168.1.149:4000/file", requestOptions)
+            .then(response => response.text())
+            .then(result => console.log(result))
+            .catch(error => console.log('error', error));
     };
 
     useEffect(() => {
-        getFileList().then((e)=>{
+        getFileList().then((e) => {
             setFileList(e)
             console.log(e)
         })
@@ -46,6 +58,16 @@ export default function (props) {
                                 <p style={{ display: 'flex', justifyContent: 'center', alignSelf: 'center' }}>Select a file to show details</p>
                             )}
                             <div style={{ textAlign: 'center' }}>
+                                <text>Authorized/Intended Users:
+                                    <input
+                                        type={'text'}
+                                        value={authUserList}
+                                        placeholder={'Comma seperated list of usernames...'}
+                                        onChange={(e) => {
+                                            setAuthUsers(e.target.value)
+                                        }}
+                                    />
+                                </text>
                                 <button onClick={handleSubmission}>Submit</button>
                             </div>
                         </div>
@@ -55,8 +77,13 @@ export default function (props) {
                 <div style={{ display: 'flex', flex: 1, }}>
                     {/* <div className="Auth-form-container"> */}
                     <div className="Auth-form-content">
-                        <h3 className="Auth-form-title">Upload File Directory</h3>
-
+                        <h3 className="Auth-form-title">Uploaded File Directory</h3>
+                        {fileList.map((filename) => {
+                            return (
+                                <div style={{ border: '1px solid grey' }}>
+                                    <button onClick={() => { downloadFile(filename).then(alert('download started')) }}>{filename}</button>
+                                </div>)
+                        })}
                     </div>
                 </div>
                 {/* </div> */}
