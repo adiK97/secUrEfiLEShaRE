@@ -65,8 +65,8 @@ def login():
 @app.route('/file', methods=['POST'])
 def upload_file():
     uploaded_file = request.files['file']
-    authUsers = request.form['users']
-    print(uploaded_file)
+    authUsers = request.form['users'].split(",")
+    print(uploaded_file, authUsers, type(authUsers))
     print(uploaded_file.filename)
     if not uploaded_file.filename == "":
         uploaded_file.save(uploaded_file.filename)

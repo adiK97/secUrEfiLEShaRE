@@ -17,7 +17,7 @@ export default function (props) {
     const handleSubmission = () => {
         var formdata = new FormData();
         formdata.append("file", selectedFile);
-        formdata.append('users', authUserList)
+        formdata.append('users', authUserList.split(" "))
         var requestOptions = {
             method: 'POST',
             body: formdata,
@@ -62,7 +62,7 @@ export default function (props) {
                                     <input
                                         type={'text'}
                                         value={authUserList}
-                                        placeholder={'Comma seperated list of usernames...'}
+                                        placeholder={'Space seperated list of usernames...'}
                                         onChange={(e) => {
                                             setAuthUsers(e.target.value)
                                         }}
@@ -81,7 +81,7 @@ export default function (props) {
                         {fileList.map((filename) => {
                             return (
                                 <div style={{ border: '1px solid grey' }}>
-                                    <button onClick={() => { downloadFile(filename).then(alert('download started')) }}>{filename}</button>
+                                    <button onClick={() => { downloadFile(filename, location?.state?.username || '').then(alert('download started')) }}>{filename}</button>
                                 </div>)
                         })}
                     </div>
