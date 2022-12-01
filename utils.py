@@ -36,8 +36,6 @@ def check_login(username,password):
     if username in passw.keys():
         check =(username+password).encode('utf-8')
         test = passw[username].encode('utf-8')
-        print("tes")
-        print(test)
         if bcrypt.checkpw(check, test):
             return username
     return
