@@ -6,6 +6,7 @@ import ftplib
 import dotenv
 from dotenv import load_dotenv
 import os
+from cryptography.fernet import Fernet
 
 load_dotenv()
 app = Flask(__name__)
@@ -60,25 +61,38 @@ def login():
     else:
         return {"result":False}
 
-# def connectFTP():
-#     global ftp_server
-#     ftp_server = ftplib.FTP(os.getenv("HOSTNAME"), os.getenv("USERNAME"),os.getenv("PASSWORD") )
-#     ftp_server.encoding = "utf-8"
-
 
 @app.route('/file', methods=['POST'])
 def upload_file():
     uploaded_file = request.files['file']
+    authUsers = request.form['users']
     print(uploaded_file)
     print(uploaded_file.filename)
     if not uploaded_file.filename == "":
         uploaded_file.save(uploaded_file.filename)
+
+        key = Fernet.generate_key()
+        f = Fernet(key)
+
+        with open(uploaded_file.filename, 'rb') as original_file:
+            original = original_file.read()
+        encrypted = f.encrypt(original)
+
+        with open ("enc_"+uploaded_file.filename, 'wb') as encrypted_file:
+            encrypted_file.write(encrypted)
+
         uploadedFiles.append(uploaded_file.filename)
         ftp_server = ftplib.FTP(os.getenv("HOSTNAME"), os.getenv("uname"),os.getenv("pass") )
         ftp_server.encoding = "utf-8"
-        with open(uploaded_file.filename, "rb") as file:
+        with open("enc_"+uploaded_file.filename, "rb") as file:
             ftp_server.storbinary(f"STOR {uploaded_file.filename}", file)
         ftp_server.quit()
+
+        with open("ftpServer/fileDetails.json", "r") as openfile:
+            files  = json.load(openfile)
+        files[uploaded_file.filename] = {"key":key.decode('utf-8'),"users":authUsers}
+        with open("ftpServer/fileDetails.json", "w") as outfile:
+            json.dump(files, outfile)
         return "Uploaded"
     return "Failed"
 
