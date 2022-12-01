@@ -1,19 +1,28 @@
 import React, { useState } from "react"
 import { createUserAPI, loginUserAPI } from "./Serverhandle/Apis"
 import { ObjectsToArray } from "./utils"
+import { redirect, useNavigate } from "react-router-dom";
 
 export default function (props) {
   let [authMode, setAuthMode] = useState("signin")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const navigate = useNavigate()
   const changeAuthMode = () => {
     setAuthMode(authMode === "signin" ? "signup" : "signin")
   }
 
   const submit = () => {
 
-    if (authMode == 'signin') loginUserAPI(username, password).then(e => console.log(e))
-    else createUserAPI(username, password).then(e => console.log(e))
+    if (authMode == 'signin') loginUserAPI(username, password).then((res) => {
+      console.log(res.result)
+      if (res.result == true) navigate('/home', { state: { username: res.username } })
+      else alert('Failed authentication')
+    })
+    else createUserAPI(username, password).then((res) => {
+      if (res.result == true) navigate('/home', { state: { username: res.username } })
+      else alert('Failed authentication')
+    })
   }
   if (authMode === "signin") {
     return (
