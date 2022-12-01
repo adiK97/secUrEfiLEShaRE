@@ -46,9 +46,9 @@ def create_username():
     data = request.get_json(force=True)
     username,password = data["username"] , data["password"]
     if add_user(username,password):
-        return {"result":"Successful", "username":username}
+        return {"result":True, "username":username}
     else:
-        return {"result":"Failed"}
+        return {"result":False}
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -57,9 +57,9 @@ def login():
     username,password = data["username"] , data["password"]
     if check_login(username,password):
         # connectFTP()
-        return {"result":"Successful","username":username}
+        return {"result":True,"username":username}
     else:
-        return {"result":"Failed"}
+        return {"result":False}
 
 def connectFTP():
     global ftp_server
