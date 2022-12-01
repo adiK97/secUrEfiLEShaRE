@@ -1,4 +1,6 @@
 import React, { useState } from "react"
+import { createUserAPI, loginUserAPI } from "./Serverhandle/Apis"
+import { ObjectsToArray } from "./utils"
 
 export default function (props) {
   let [authMode, setAuthMode] = useState("signin")
@@ -8,8 +10,10 @@ export default function (props) {
     setAuthMode(authMode === "signin" ? "signup" : "signin")
   }
 
-  const signIn = () => {
+  const submit = () => {
 
+    if (authMode == 'signin') loginUserAPI(username, password).then(e => console.log(e))
+    else createUserAPI(username, password).then(e => console.log(e))
   }
   if (authMode === "signin") {
     return (
@@ -44,7 +48,7 @@ export default function (props) {
               />
             </div>
             <div className="d-grid gap-2 mt-3">
-              <button type="submit" onClick={signIn} className="btn btn-primary">
+              <button type="submit" onClick={submit} className="btn btn-primary">
                 Submit
               </button>
             </div>
@@ -88,7 +92,7 @@ export default function (props) {
             />
           </div>
           <div className="d-grid gap-2 mt-3">
-            <button onClick={signIn} type="submit" className="btn btn-primary">
+            <button onClick={submit} type="submit" className="btn btn-primary">
               Submit
             </button>
           </div>

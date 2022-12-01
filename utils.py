@@ -46,7 +46,7 @@ def create_username():
     data = request.get_json(force=True)
     username,password = data["username"] , data["password"]
     if add_user(username,password):
-        return {"result":"Successful"}
+        return {"result":"Successful", "username":username}
     else:
         return {"result":"Failed"}
 
@@ -56,8 +56,8 @@ def login():
     data = request.get_json(force=True)
     username,password = data["username"] , data["password"]
     if check_login(username,password):
-        connectFTP()
-        return {"result":"Successful"}
+        # connectFTP()
+        return {"result":"Successful","username":username}
     else:
         return {"result":"Failed"}
 
