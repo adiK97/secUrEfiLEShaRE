@@ -56,31 +56,31 @@ def login():
     data = request.get_json(force=True)
     username,password = data["username"] , data["password"]
     if check_login(username,password):
-        # connectFTP()
         return {"result":True,"username":username}
     else:
         return {"result":False}
 
-def connectFTP():
-    global ftp_server
-    ftp_server = ftplib.FTP(os.getenv("HOSTNAME"), os.getenv("USERNAME"),os.getenv("PASSWORD") )
-    ftp_server.encoding = "utf-8"
+# def connectFTP():
+#     global ftp_server
+#     ftp_server = ftplib.FTP(os.getenv("HOSTNAME"), os.getenv("USERNAME"),os.getenv("PASSWORD") )
+#     ftp_server.encoding = "utf-8"
 
 
-# @app.route('/uploadFile', methods=['POST'])
-# def upload_file():
-#     uploaded_file = request.files['file']
-#     print(uploaded_file)
-#     print(uploaded_file.filename)
-#     if not uploaded_file.filename == "":
-#         uploaded_file.save(uploaded_file.filename)
-#         uploadedFiles.append(uploaded_file.filename)
-#         with open(uploaded_file.filename, "rb") as file:
-# # Command for Uploading the file "STOR filename"
-#             ftp_server.storbinary(f"STOR {uploaded_file.filename}", file)
-#         return "Uploaded"
-#     return "Failed"
-
+@app.route('/uploadFile', methods=['POST'])
+def upload_file():
+    uploaded_file = request.files['file']
+    print(uploaded_file)
+    print(uploaded_file.filename)
+    if not uploaded_file.filename == "":
+        uploaded_file.save(uploaded_file.filename)
+        uploadedFiles.append(uploaded_file.filename)
+        ftp_server = ftplib.FTP(os.getenv("HOSTNAME"), os.getenv("uname"),os.getenv("pass") )
+        ftp_server.encoding = "utf-8"
+        with open(uploaded_file.filename, "rb") as file:
+            ftp_server.storbinary(f"STOR {uploaded_file.filename}", file)
+        ftp_server.quit()
+        return "Uploaded"
+    return "Failed"
 
 @app.route('/uploadFile', methods=['GET'])
 def fileList():
