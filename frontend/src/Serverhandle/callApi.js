@@ -14,17 +14,20 @@ export async function callApi({ endpoint, method = 'get', body = undefined, full
     // console.log('body', body)
 
     if (downloadAPI) {
-        return fetch(url, { method, body: JSON.stringify(body) })
+        return await fetch(url, { method, body: JSON.stringify(body) })
             .then(response => {
-                console.log('headers', response, response.headers)
-                const filename = response.headers.get('Content-Disposition').split('filename=')[1];
-                response.blob().then(blob => {
-                    let url = window.URL.createObjectURL(blob);
-                    let a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    a.click();
-                });
+                console.log('headers', response)
+                if (response.ok) {
+                    response.blob().then(blob => {
+                        let url = window.URL.createObjectURL(blob);
+                        let a = document.createElement('a');
+                        a.href = url;
+                        a.download = body.filename;
+                        a.click();
+                    });
+                }else {
+                    alert("no")
+                }
             }).catch(err => console.log(err));
     }
 

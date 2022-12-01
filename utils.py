@@ -1,7 +1,7 @@
 import bcrypt
 from basicauth import encode
 import json
-from flask import Flask, request, redirect, send_from_directory, make_response
+from flask import Flask, request, redirect, send_from_directory, make_response, send_file
 import ftplib
 import dotenv
 from dotenv import load_dotenv
@@ -115,7 +115,10 @@ def download_file():
     if not filename in uploadedFiles or not username in files[filename]["users"]:
         print(filename in uploadedFiles)
         print(username in files[filename]["users"])
-        return {"result":False}
+        # return {"result":'false'}
+        response = make_response({"result":"False"})
+        response.status = 404
+        return response
 
     f = Fernet(files[filename]["key"].encode('utf-8'))
 
@@ -131,7 +134,7 @@ def download_file():
     decrypted = f.decrypt(encrypted)
     with open("Dec_downloaded_"+filename, 'wb') as decrypted_file:
         decrypted_file.write(decrypted)
-    response = make_response(send_from_directory("","Dec_downloaded_"+filename , as_attachment=True))
+    response = make_response(send_file("Dec_downloaded_"+filename, as_attachment=True))
     response.headers['X-filename'] = filename
     return response
     # return send_from_directory("","Dec_downloaded_"+filename , as_attachment=True)
