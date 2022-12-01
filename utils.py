@@ -87,10 +87,12 @@ def upload_file():
         with open("enc_"+uploaded_file.filename, "rb") as file:
             ftp_server.storbinary(f"STOR {uploaded_file.filename}", file)
         ftp_server.quit()
-        
+
         with open("ftpServer/fileDetails.json", "r") as openfile:
             files  = json.load(openfile)
+
         files[uploaded_file.filename] = {"key":key.decode('utf-8'),"users":authUsers}
+
         with open("ftpServer/fileDetails.json", "w") as outfile:
             json.dump(files, outfile)
         return {'result':True}
@@ -102,19 +104,31 @@ def fileList():
     return uploadedFiles
 
 
-@app.route('/file', methods=['GET'])
+@app.route('/download', methods=['POST'])
 def download_file():
     data = request.get_json(force=True)
     filename = data["filename"]
-    if not filename in uploadedFiles:
+    username = data["username"]
+    with open("ftpServer/fileDetails.json", "r") as openfile:
+        files  = json.load(openfile)
+    
+    if not filename in uploadedFiles or not username in files[filename]["users"]:
         return {"result":False}
+    f = Fernet(files[filename]["key"].encode('utf-8'))
 
     ftp_server = ftplib.FTP(os.getenv("HOSTNAME"), os.getenv("uname"),os.getenv("pass") )
     ftp_server.encoding = "utf-8"    
-    with open(filename, "wb") as file:
+    with open("downloaded_"+filename, "wb") as file:
     # Command for Downloading the file "RETR filename"
         ftp_server.retrbinary(f"RETR {filename}", file.write)
-    return send_from_directory("",filename , as_attachment=True)
+        
+    with open("downloaded_"+filename, 'rb') as encrypted_file:
+        encrypted = encrypted_file.read()
+
+    decrypted = f.decrypt(encrypted)
+    with open("Dec_downloaded_"+filename, 'wb') as decrypted_file:
+        decrypted_file.write(decrypted) 
+    return send_from_directory("","Dec_downloaded_"+filename , as_attachment=True)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4000)
