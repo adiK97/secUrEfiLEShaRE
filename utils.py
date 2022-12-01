@@ -1,7 +1,7 @@
 import bcrypt
 from basicauth import encode
 import json
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, send_from_directory
 import ftplib
 import dotenv
 from dotenv import load_dotenv
@@ -66,7 +66,7 @@ def login():
 #     ftp_server.encoding = "utf-8"
 
 
-@app.route('/uploadFile', methods=['POST'])
+@app.route('/file', methods=['POST'])
 def upload_file():
     uploaded_file = request.files['file']
     print(uploaded_file)
@@ -82,11 +82,25 @@ def upload_file():
         return {'result':True}
     return {"result":False}
 
-@app.route('/uploadFile', methods=['GET'])
+
+@app.route('/fileList', methods=['GET'])
 def fileList():
     return uploadedFiles
 
 
+@app.route('/file', methods=['GET'])
+def download_file():
+    data = request.get_json(force=True)
+    filename = data["filename"]
+    if not filename in uploadedFiles:
+        return {"result":False}
+
+    ftp_server = ftplib.FTP(os.getenv("HOSTNAME"), os.getenv("uname"),os.getenv("pass") )
+    ftp_server.encoding = "utf-8"    
+    with open(filename, "wb") as file:
+    # Command for Downloading the file "RETR filename"
+        ftp_server.retrbinary(f"RETR {filename}", file.write)
+    return send_from_directory("",filename , as_attachment=True)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4000)
