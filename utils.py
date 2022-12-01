@@ -87,14 +87,14 @@ def upload_file():
         with open("enc_"+uploaded_file.filename, "rb") as file:
             ftp_server.storbinary(f"STOR {uploaded_file.filename}", file)
         ftp_server.quit()
-
+        
         with open("ftpServer/fileDetails.json", "r") as openfile:
             files  = json.load(openfile)
         files[uploaded_file.filename] = {"key":key.decode('utf-8'),"users":authUsers}
         with open("ftpServer/fileDetails.json", "w") as outfile:
             json.dump(files, outfile)
-        return "Uploaded"
-    return "Failed"
+        return {'result':True}
+    return {"result":False}
 
 
 @app.route('/fileList', methods=['GET'])

@@ -11,3 +11,7 @@ export const createUserAPI = async (username, password) => {
 export const sendFile = async (formData) => {
   return await callApi({ endpoint: 'uploadFile', method: 'post', body: formData })
 }
+
+export const getFileList = async () => {
+  return await callApi({ endpoint: 'uploadFile', method: 'get' })
+}
