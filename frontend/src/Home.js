@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-
-export default function () {
+import { useLocation, useNavigate } from 'react-router-dom';
+import { sendFile } from './Serverhandle/Apis'
+export default function (props) {
+    const location = useLocation()
     const [selectedFile, setSelectedFile] = useState();
     const [isFilePicked, setIsFilePicked] = useState(false);
-
+    const navigate = useNavigate()
     const changeHandler = (event) => {
         setSelectedFile(event.target.files[0]);
         setIsFilePicked(true);
@@ -11,29 +13,14 @@ export default function () {
 
     const handleSubmission = () => {
         const formData = new FormData();
-
         formData.append('File', selectedFile);
-
-        fetch(
-            'https://freeimage.host/api/1/upload?key=<YOUR_API_KEY>',
-            {
-                method: 'POST',
-                body: formData,
-            }
-        )
-            .then((response) => response.json())
-            .then((result) => {
-                console.log('Success:', result);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+        sendFile(formData).catch(alert)
     };
 
     return (
         <>
             <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-                <div className="Auth-form-container" style={{ flex: 1 }}>
+                <div className="Auth-form-container" style={{ flex: 1, flexDirection: 'column' }}>
                     <form className="Auth-form">
                         <div className="Auth-form-content">
                             <h3 className="Auth-form-title">Upload a File</h3>
@@ -56,15 +43,15 @@ export default function () {
                             </div>
                         </div>
                     </form>
-
+                    <button style={{ margin: 15 }} onClick={() => navigate('/')}>Logout, {location?.state?.username}</button>
                 </div>
-                <div style={{ display: 'flex', flex: 1,}}>
+                <div style={{ display: 'flex', flex: 1, }}>
                     {/* <div className="Auth-form-container"> */}
-                        <div className="Auth-form-content">
-                            <h3 className="Auth-form-title">Upload File Directory</h3>
-                            
-                        </div>
+                    <div className="Auth-form-content">
+                        <h3 className="Auth-form-title">Upload File Directory</h3>
+
                     </div>
+                </div>
                 {/* </div> */}
             </div>
 
